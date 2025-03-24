@@ -27,7 +27,7 @@ let gameOverText;
 let levelCompleteText;
 
 function preload() {
-    // this.load.image('background', '/images/space.jpg');
+    this.load.image('background', '/images/space.jpg');
 
     this.load.image('nloA', '/images/nloA.png'); // Уникальные файлы
     this.load.image('nloB', '/images/nloB.png');
@@ -41,6 +41,20 @@ function preload() {
 }
 
 function create() {
+    let background = this.add.image(0, 0, 'background').setOrigin(0, 0);
+
+    // Получаем размеры экрана
+    let scaleX = game.config.width / background.width;
+    let scaleY = game.config.height / background.height;
+
+    // Выбираем наименьший коэффициент масштаба, чтобы не было растягивания
+    let scale = Math.max(scaleX, scaleY);
+
+    // Применяем масштаб и подгоняем фон под экран
+    background.setScale(scale);
+
+    // Центрируем фон, чтобы он не смещался
+    background.setPosition(game.config.width / 2 - background.width * scale / 2, game.config.height / 2 - background.height * scale / 2);
     // Создаем группу НЛО
     nlos = this.physics.add.group();
     const nloKeys = ['nloA', 'nloB', 'nloC', 'nloD'];
