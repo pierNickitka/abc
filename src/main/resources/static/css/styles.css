@@ -66,3 +66,48 @@ body {
     transform: scale(1.1);
     background-color: #57379d; /* Ярче синий на ховер */
 }
+
+
+
+.game-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.nlo-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    margin-top: 50px;
+}
+
+.nlo {
+    width: 80px;
+    height: 80px;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Стили для перетаскиваемой буквы */
+.letter {
+    width: 40px;
+    height: 40px;
+    background-color: #5d3ebc; /* Фиолетовый цвет буквы */
+    color: white;
+    font-size: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s;
+    position: relative;
+}
+
+.letter:active {
+    opacity: 0.6;
+    cursor: grabbing;
+}
