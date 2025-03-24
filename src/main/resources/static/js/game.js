@@ -2,39 +2,26 @@ const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
-    parent: 'game-container', // Привязываем к контейнеру
+    parent: 'game-container',
     backgroundColor: '#000000',
     physics: {
         default: 'arcade',
-        arcade: {
-            debug: false
-        }
+        arcade: { debug: false }
     },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update,
-        key: 'gameScene'
-    }
+    scene: { preload, create, update, key: 'gameScene' }
 };
 
 const game = new Phaser.Game(config);
-
-let nlos;
-let planets;
+let nlos, planets;
 let lives = 3;
-let livesText;
-let gameOverText;
-let levelCompleteText;
+let livesText, gameOverText, levelCompleteText;
 
 function preload() {
     this.load.image('background', '/images/space.jpg');
-
-    this.load.image('nloA', '/images/nloA.png'); // Уникальные файлы
+    this.load.image('nloA', '/images/nloA.png');
     this.load.image('nloB', '/images/nloB.png');
     this.load.image('nloC', '/images/nloC.png');
     this.load.image('nloD', '/images/nloD.png');
-
     this.load.image('planetA', '/images/planetA.png');
     this.load.image('planetB', '/images/planetB.png');
     this.load.image('planetC', '/images/planetC.png');
@@ -42,80 +29,51 @@ function preload() {
 }
 
 function create() {
-    // Добавляем фон
     let background = this.add.image(0, 0, 'background').setOrigin(0, 0);
+    let scale = Math.max(game.config.width / background.width, game.config.height / background.height);
+    background.setScale(scale).setPosition(game.config.width / 2 - background.width * scale / 2, game.config.height / 2 - background.height * scale / 2);
 
-    // Получаем размеры экрана
-    let scaleX = game.config.width / background.width;
-    let scaleY = game.config.height / background.height;
+    // Генерация букв и соответствующих объектов
+    let letters = ['A', 'B', 'C', 'D'];
+    Phaser.Utils.Array.Shuffle(letters);
 
-    // Выбираем наименьший коэффициент масштаба, чтобы не было растягивания
-    let scale = Math.max(scaleX, scaleY);
-
-    // Применяем масштаб и подгоняем фон под экран
-    background.setScale(scale);
-
-    // Центрируем фон, чтобы он не смещался
-    background.setPosition(game.config.width / 2 - background.width * scale / 2, game.config.height / 2 - background.height * scale / 2);
-
-    // Создаем группу НЛО
+    // Создание НЛО
     nlos = this.physics.add.group();
-    const nloKeys = ['nloA', 'nloB', 'nloC', 'nloD'];
+    let nloKeys = ['nloA', 'nloB', 'nloC', 'nloD'];
+    let startX = game.config.width * 0.2, gap = game.config.width * 0.2;
 
-    let startX = game.config.width * 0.2;
-    let gap = game.config.width * 0.2;
-
-    for (let i = 0; i < nloKeys.length; i++) {
-        let nlo = nlos.create(startX + i * gap, game.config.height * 0.2, nloKeys[i]).setInteractive();
+    for (let i = 0; i < letters.length; i++) {
+        let nlo = nlos.create(startX + i * gap, game.config.height * 0.2, `nlo${letters[i]}`).setInteractive();
         nlo.setScale(0.2);
-        nlo.startX = nlo.x; // Сохраняем начальные координаты
+        nlo.startX = nlo.x;
         nlo.startY = nlo.y;
+        nlo.letter = letters[i]; // Теперь буква строго соответствует изображению
+        nlo.letterText = this.add.text(nlo.x, nlo.y, letters[i], { fontSize: '64px', fontWeight: 'bold', fill: '#00FF00' }).setOrigin(0.5);
 
-        // Добавляем текст с буквой на НЛО
-        const letter = nlo.texture.key.replace('nlo', '').toUpperCase();
-        nlo.letterText = this.add.text(nlo.x, nlo.y, letter, {
-            fontSize: '64px', // Увеличиваем размер шрифта
-            fontWeight: 'bold', // Жирный шрифт
-            fill: '#00FF00' // Зеленый цвет
-        }).setOrigin(0.5);
-
-        // Обновляем позицию текста при перемещении НЛО
-        nlo.on('drag', () => {
-            nlo.letterText.setPosition(nlo.x, nlo.y);
-        });
+        nlo.on('drag', () => nlo.letterText.setPosition(nlo.x, nlo.y));
     }
 
-    // Создаем планеты
+    // Создание планет
+    Phaser.Utils.Array.Shuffle(letters);
     planets = this.physics.add.staticGroup();
-    const planetKeys = ['planetA', 'planetB', 'planetC', 'planetD'];
+    let startXPlanets = game.config.width * 0.2, gapPlanets = game.config.width * 0.2;
 
-    let startXPlanets = game.config.width * 0.2;
-    let gapPlanets = game.config.width * 0.2;
-
-    for (let i = 0; i < planetKeys.length; i++) {
-        let planet = planets.create(startXPlanets + i * gapPlanets, game.config.height * 0.7, planetKeys[i])
-            .setScale(0.3)
-            .refreshBody();
-
-        // Добавляем текст с буквой на планете
-        const letter = planet.texture.key.replace('planet', '').toUpperCase();
-        planet.letterText = this.add.text(planet.x, planet.y, letter, {
-            fontSize: '64px', // Увеличиваем размер шрифта
-            fontWeight: 'bold', // Жирный шрифт
-            fill: '#c54b65' // Красный цвет
-        }).setOrigin(0.5);
+    for (let i = 0; i < letters.length; i++) {
+        let planet = planets.create(startXPlanets + i * gapPlanets, game.config.height * 0.7, `planet${letters[i]}`)
+    .setScale(0.3).refreshBody();
+        planet.letter = letters[i]; // Теперь буква строго соответствует изображению
+        planet.letterText = this.add.text(planet.x, planet.y, letters[i].toLowerCase(), { fontSize: '64px', fontWeight: 'bold', fill: '#c54b65' }).setOrigin(0.5);
     }
 
-    // Текст с жизнями
+    // Жизни
     livesText = this.add.text(16, 16, 'Жизни: ' + lives, { fontSize: '32px', fill: '#fff' });
 
-    // Тексты о завершении
+    // Финальные надписи
     gameOverText = this.add.text(game.config.width / 2, game.config.height / 2, '', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
     levelCompleteText = this.add.text(game.config.width / 2, game.config.height / 2 + 100, '', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
 
-    // Взаимодействие с НЛО
+    // Перетаскивание НЛО
     this.input.setDraggable(nlos.getChildren());
-
     this.input.on('drag', (pointer, nlo, dragX, dragY) => {
         nlo.x = dragX;
         nlo.y = dragY;
@@ -123,7 +81,6 @@ function create() {
 
     this.input.on('dragend', (pointer, nlo) => {
         let planetHit = null;
-
         planets.getChildren().forEach(planet => {
             if (Phaser.Geom.Intersects.RectangleToRectangle(nlo.getBounds(), planet.getBounds())) {
                 planetHit = planet;
@@ -133,43 +90,39 @@ function create() {
         if (planetHit) {
             hitPlanet(nlo, planetHit);
         } else {
-            nlo.setPosition(nlo.startX, nlo.startY); // Возвращаем на стартовую позицию
-            nlo.letterText.setPosition(nlo.startX, nlo.startY); // Обновляем позицию текста
+            returnToStart(nlo);
         }
     });
 }
 
 function hitPlanet(nlo, planet) {
-    console.log(nlo.texture.key, planet.texture.key); // Отладка
-    const nloLetter = nlo.texture.key.replace('nlo', '').toLowerCase();
-    const planetLetter = planet.texture.key.replace('planet', '').toLowerCase();
+    const nloLetter = nlo.letter.toLowerCase();
+    const planetLetter = planet.letter.toLowerCase();
     if (nloLetter === planetLetter) {
-        // Перемещаем НЛО на позицию планеты
         nlo.setPosition(planet.x, planet.y);
-        nlo.letterText.setPosition(planet.x, planet.y); // Обновляем позицию текста на НЛО
-        // Делаем НЛО неподвижным, чтобы оно не могло быть перетащено снова
-        nlo.setInteractive(false); // Блокируем возможность перетаскивания
-        nlo.correctlyPlaced = true; // Устанавливаем флаг корректного размещения
-        // Удаляем текст с буквой на планете, так как буква уже соответствует
+        nlo.letterText.setPosition(planet.x, planet.y);
+        nlo.setInteractive(false);
+        nlo.correctlyPlaced = true;
         planet.letterText.setText('');
-        // Убедимся, что НЛО отображается поверх планеты
-        nlo.setDepth(planet.depth + 1); // Устанавливаем слой НЛО выше планеты
-        checkWinCondition(); // Проверяем условие победы
+        nlo.setDepth(planet.depth + 1);
+        checkWinCondition();
     } else {
-        // Возвращаем НЛО на его начальную позицию
-        nlo.setPosition(nlo.startX, nlo.startY);
-        nlo.letterText.setPosition(nlo.startX, nlo.startY); // Обновляем позицию текста на НЛО
-        // Отнимаем жизнь
+        returnToStart(nlo);
         lives--;
         livesText.setText('Жизни: ' + lives);
         if (lives <= 0) {
             gameOverText.setText('Игра окончена!');
+            showGameOverModal();
         }
     }
 }
 
+function returnToStart(nlo) {
+    nlo.setPosition(nlo.startX, nlo.startY);
+    nlo.letterText.setPosition(nlo.startX, nlo.startY);
+}
+
 function checkWinCondition() {
-    // Проверяем, все ли НЛО на правильных планетах
     let allCorrect = true;
     nlos.getChildren().forEach(nlo => {
         if (!nlo.correctlyPlaced) {
@@ -178,36 +131,35 @@ function checkWinCondition() {
     });
 
     if (allCorrect) {
-        levelCompleteText.setText('Поздравляем, вы выиграли!');
+        const winModal = document.getElementById('win-modal');
+        winModal.classList.add('show');
+        game.scene.pause();
     }
 }
+
 function update() {
     if (lives <= 0) {
         gameOverText.setText('Игра окончена!');
-        nlos.getChildren().forEach(nlo => nlo.setTint(0xff0000)); // Красим все НЛО в красный цвет
-
-        // Показываем модальное окно с сообщением о проигрыше
+        nlos.getChildren().forEach(nlo => nlo.setTint(0xff0000));
         showGameOverModal();
     }
 }
+
 function showGameOverModal() {
     const gameOverModal = document.getElementById('game-over-modal');
-    gameOverModal.classList.add('show'); // Показываем модальное окно
-    game.scene.pause(); // Останавливаем игру
+    gameOverModal.classList.add('show');
+    game.scene.pause();
 }
 
 function restartGame() {
-    // Скрываем модальное окно и перезагружаем игру
-    const gameOverModal = document.getElementById('game-over-modal');
-    gameOverModal.classList.remove('show'); // Скрываем модальное окно
-    lives = 3; // Восстанавливаем жизни
+    document.getElementById('game-over-modal').classList.remove('show');
+    document.getElementById('win-modal').classList.remove('show');
+    lives = 3;
     livesText.setText('Жизни: ' + lives);
-    gameOverText.setText(''); // Убираем текст окончания игры
-
-    // Перезапускаем сцену (игру) для сброса всех объектов в исходное состояние
-    game.scene.start("gameScene"); // Перезагружаем текущую сцену
+    levelCompleteText.setText('');
+    game.scene.start("gameScene");
 }
 
-function goToMenu(){
-    window.location.href="/";
+function goToMenu() {
+    window.location.href = "/";
 }
