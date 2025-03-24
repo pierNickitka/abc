@@ -1,31 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
-    <title>Игра</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра: НЛО</title>
+    <link rel="stylesheet" href="/css/game.css">  <!-- Путь к CSS-стилям -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="/js/game.js"></script>  <!-- Путь к JavaScript-коду -->
 </head>
 <body>
-<h1>Здесь будет игра!</h1>
-<a href="/letterA">Назад</a>
-
-<div class="game-container">
-    <div class="nlo-container">
-        <div class="nlo" id="nloA">
-            <div class="letter" id="letterA">A</div>
-        </div>
-        <div class="nlo" id="nloB">
-            <div class="letter" id="letterB">B</div>
-        </div>
-        <div class="nlo" id="nloC">
-            <div class="letter" id="letterC">C</div>
-        </div>
-        <div class="nlo" id="nloD">
-            <div class="letter" id="letterD">D</div>
-        </div>
-    </div>
+<div class="container">
+    <div id="game-container" class="game-container"></div>
+    <button class="abc-button" onclick="window.location.href='/'">Вернуться в главное меню</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.11/dist/interact.min.js"></script>
-<script src="/js/drag.js"></script>
+<img src="/images/planet.png" alt="NLO Image"> <!-- Правильный путь к изображению -->
 </body>
 </html>

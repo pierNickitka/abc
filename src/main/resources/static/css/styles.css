@@ -67,8 +67,6 @@ body {
     background-color: #57379d; /* Ярче синий на ховер */
 }
 
-
-
 .game-container {
     position: relative;
     height: 100%;
@@ -76,38 +74,62 @@ body {
 }
 
 .nlo-container {
+    display: flex; /* Расположение элементов в ряд */
+    justify-content: space-around; /* Распределение элементов по горизонтали */
+    align-items: flex-start; /* Выравнивание по верхнему краю */
+    margin-top: 50px; /* Отступ сверху */
+    width: 100%;
+    position: relative; /* Устанавливаем относительное позиционирование */
+}
+
+.planet-container {
     display: flex;
     justify-content: space-around;
-    align-items: flex-start;
     margin-top: 50px;
+    position: relative;
+    width: 100%;
 }
 
-.nlo {
-    width: 80px;
-    height: 80px;
-    background-color: transparent;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Стили для перетаскиваемой буквы */
-.letter {
-    width: 40px;
-    height: 40px;
+.nlo, .planet {
+    font-size: 30px;
     background-color: #5d3ebc; /* Фиолетовый цвет буквы */
     color: white;
-    font-size: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
     cursor: pointer;
     transition: transform 0.3s;
-    position: relative;
+    position: relative; /* Используем relative для начальной позиции */
 }
 
-.letter:active {
-    opacity: 0.6;
-    cursor: grabbing;
+.planet {
+    background-color: #3a1f7b; /* Темно-синий для планет */
+}
+
+.nlo {
+    margin-top: 50px;
+}
+
+.hidden {
+    display: none;
+}
+
+.info {
+    margin-top: 20px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #5d3ebc;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #7f44b8;
 }
