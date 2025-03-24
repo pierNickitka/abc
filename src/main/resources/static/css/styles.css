@@ -1,0 +1,68 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: linear-gradient(to right, #0a1d2f, #4e2c7a); /* Тёмный космический градиент */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.container {
+    position: relative;
+}
+
+.abc-button {
+    font-size: 50px;
+    padding: 20px;
+    background-color: #5d3ebc; /* Фиолетовый космический цвет */
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.abc-button:hover {
+    transform: scale(1.1);
+    background-color: #7f44b8; /* Яркий фиолетовый на ховер */
+}
+
+.letter {
+    font-size: 100px;
+    cursor: pointer;
+    color: white; /* Буква белая */
+    padding: 20px; /* Добавляем внутренний отступ, чтобы буква была похожа на кнопку */
+    background-color: #5d3ebc; /* Фиолетовый космический цвет */
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.letter:hover {
+    transform: scale(1.1);
+    background-color: #7f44b8; /* Ярче фиолетовый на ховер */
+}
+
+.menu {
+    display: none;
+    margin-top: 20px;
+}
+
+.menu a {
+    display: block;
+    font-size: 24px;
+    background-color: #3a1f7b; /* Тёмно-синий, чтобы соответствовать космической теме */
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: white;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.menu a:hover {
+    transform: scale(1.1);
+    background-color: #57379d; /* Ярче синий на ховер */
+}
