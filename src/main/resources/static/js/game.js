@@ -27,6 +27,8 @@ let gameOverText;
 let levelCompleteText;
 
 function preload() {
+    // this.load.image('background', '/images/space.jpg');
+
     this.load.image('nloA', '/images/nloA.png'); // Уникальные файлы
     this.load.image('nloB', '/images/nloB.png');
     this.load.image('nloC', '/images/nloC.png');
@@ -74,9 +76,17 @@ function create() {
     let gapPlanets = game.config.width * 0.2;
 
     for (let i = 0; i < planetKeys.length; i++) {
-        planets.create(startXPlanets + i * gapPlanets, game.config.height * 0.7, planetKeys[i])
+        let planet = planets.create(startXPlanets + i * gapPlanets, game.config.height * 0.7, planetKeys[i])
             .setScale(0.3)
             .refreshBody();
+
+        // Добавляем текст с буквой на планете
+        const letter = planet.texture.key.replace('planet', '').toUpperCase();
+        planet.letterText = this.add.text(planet.x, planet.y, letter, {
+            fontSize: '64px', // Увеличиваем размер шрифта
+            fontWeight: 'bold', // Жирный шрифт
+            fill: '#c54b65' // Зеленый цвет
+        }).setOrigin(0.5);
     }
 
     // Текст с жизнями
@@ -114,23 +124,44 @@ function create() {
 
 function hitPlanet(nlo, planet) {
     console.log(nlo.texture.key, planet.texture.key); // Отладка
-
     const nloLetter = nlo.texture.key.replace('nlo', '').toLowerCase();
     const planetLetter = planet.texture.key.replace('planet', '').toLowerCase();
-
     if (nloLetter === planetLetter) {
-        nlo.disableBody(true, true);
-        nlo.letterText.destroy(); // Удаляем текст с буквой НЛО, если оно уничтожено
-        checkWinCondition();
+        // Перемещаем НЛО на позицию планеты
+        nlo.setPosition(planet.x, planet.y);
+        nlo.letterText.setPosition(planet.x, planet.y); // Обновляем позицию текста на НЛО
+        // Делаем НЛО неподвижным, чтобы оно не могло быть перетащено снова
+        nlo.setInteractive(false); // Блокируем возможность перетаскивания
+        nlo.correctlyPlaced = true; // Устанавливаем флаг корректного размещения
+        // Удаляем текст с буквой на планете, так как буква уже соответствует
+        planet.letterText.setText('');
+        // Убедимся, что НЛО отображается поверх планеты
+        nlo.setDepth(planet.depth + 1); // Устанавливаем слой НЛО выше планеты
+        checkWinCondition(); // Проверяем условие победы
     } else {
-        nlo.setPosition(nlo.startX, nlo.startY); // Возвращаем на свою позицию
-        nlo.letterText.setPosition(nlo.startX, nlo.startY); // Обновляем позицию текста
+        // Возвращаем НЛО на его начальную позицию
+        nlo.setPosition(nlo.startX, nlo.startY);
+        nlo.letterText.setPosition(nlo.startX, nlo.startY); // Обновляем позицию текста на НЛО
+        // Отнимаем жизнь
         lives--;
         livesText.setText('Жизни: ' + lives);
-
         if (lives <= 0) {
             gameOverText.setText('Игра окончена!');
         }
+    }
+}
+
+function checkWinCondition() {
+    // Проверяем, все ли НЛО на правильных планетах
+    let allCorrect = true;
+    nlos.getChildren().forEach(nlo => {
+        if (!nlo.correctlyPlaced) {
+            allCorrect = false;
+        }
+    });
+
+    if (allCorrect) {
+        levelCompleteText.setText('Поздравляем, вы выиграли!');
     }
 }
 
@@ -142,9 +173,3 @@ function update() {
 }
 
 
-function checkWinCondition() {
-    console.log(nlos.countActive()); // Проверяем активные НЛО
-    if (nlos.countActive() === 0) {
-        levelCompleteText.setText('Поздравляем, вы выиграли!');
-    }
-}
