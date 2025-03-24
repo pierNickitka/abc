@@ -39,24 +39,39 @@ function preload() {
 }
 
 function create() {
-    // Создаем группу НЛО с равномерным распределением
+    // Создаем группу НЛО
     nlos = this.physics.add.group();
     const nloKeys = ['nloA', 'nloB', 'nloC', 'nloD'];
 
-    let startX = game.config.width * 0.2; // Начальная позиция НЛО
-    let gap = game.config.width * 0.2; // Расстояние между НЛО
+    let startX = game.config.width * 0.2;
+    let gap = game.config.width * 0.2;
 
     for (let i = 0; i < nloKeys.length; i++) {
         let nlo = nlos.create(startX + i * gap, game.config.height * 0.2, nloKeys[i]).setInteractive();
         nlo.setScale(0.2);
+        nlo.startX = nlo.x; // Сохраняем начальные координаты
+        nlo.startY = nlo.y;
+
+        // Добавляем текст с буквой на НЛО
+        const letter = nlo.texture.key.replace('nlo', '').toUpperCase();
+        nlo.letterText = this.add.text(nlo.x, nlo.y, letter, {
+            fontSize: '64px', // Увеличиваем размер шрифта
+            fontWeight: 'bold', // Жирный шрифт
+            fill: '#00FF00' // Зеленый цвет
+        }).setOrigin(0.5);
+
+        // Обновляем позицию текста при перемещении НЛО
+        nlo.on('drag', () => {
+            nlo.letterText.setPosition(nlo.x, nlo.y);
+        });
     }
 
-    // Создаем планеты с равномерным распределением
+    // Создаем планеты
     planets = this.physics.add.staticGroup();
     const planetKeys = ['planetA', 'planetB', 'planetC', 'planetD'];
 
-    let startXPlanets = game.config.width * 0.2; // Начальная позиция планет
-    let gapPlanets = game.config.width * 0.2; // Расстояние между планетами
+    let startXPlanets = game.config.width * 0.2;
+    let gapPlanets = game.config.width * 0.2;
 
     for (let i = 0; i < planetKeys.length; i++) {
         planets.create(startXPlanets + i * gapPlanets, game.config.height * 0.7, planetKeys[i])
@@ -67,15 +82,9 @@ function create() {
     // Текст с жизнями
     livesText = this.add.text(16, 16, 'Жизни: ' + lives, { fontSize: '32px', fill: '#fff' });
 
-    // Текст о конце игры
-    gameOverText = this.add.text(game.config.width / 2, game.config.height / 2, '', {
-        fontSize: '48px', fill: '#fff'
-    }).setOrigin(0.5);
-
-    // Текст о победе
-    levelCompleteText = this.add.text(game.config.width / 2, game.config.height / 2 + 100, '', {
-        fontSize: '48px', fill: '#fff'
-    }).setOrigin(0.5);
+    // Тексты о завершении
+    gameOverText = this.add.text(game.config.width / 2, game.config.height / 2, '', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
+    levelCompleteText = this.add.text(game.config.width / 2, game.config.height / 2 + 100, '', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
 
     // Взаимодействие с НЛО
     this.input.setDraggable(nlos.getChildren());
@@ -97,10 +106,12 @@ function create() {
         if (planetHit) {
             hitPlanet(nlo, planetHit);
         } else {
-            nlo.setPosition(startX + (nlos.getChildren().indexOf(nlo) * gap), game.config.height * 0.2);
+            nlo.setPosition(nlo.startX, nlo.startY); // Возвращаем на стартовую позицию
+            nlo.letterText.setPosition(nlo.startX, nlo.startY); // Обновляем позицию текста
         }
     });
 }
+
 function hitPlanet(nlo, planet) {
     console.log(nlo.texture.key, planet.texture.key); // Отладка
 
@@ -109,9 +120,11 @@ function hitPlanet(nlo, planet) {
 
     if (nloLetter === planetLetter) {
         nlo.disableBody(true, true);
+        nlo.letterText.destroy(); // Удаляем текст с буквой НЛО, если оно уничтожено
         checkWinCondition();
     } else {
-        nlo.setPosition(150 + (nlos.getChildren().indexOf(nlo) * 200), 100);
+        nlo.setPosition(nlo.startX, nlo.startY); // Возвращаем на свою позицию
+        nlo.letterText.setPosition(nlo.startX, nlo.startY); // Обновляем позицию текста
         lives--;
         livesText.setText('Жизни: ' + lives);
 
