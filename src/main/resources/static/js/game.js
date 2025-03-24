@@ -15,6 +15,7 @@ const game = new Phaser.Game(config);
 let nlos, planets;
 let lives = 3;
 let livesText, gameOverText, levelCompleteText;
+let music;
 
 function preload() {
     this.load.image('background', '/images/space.jpg');
@@ -26,9 +27,14 @@ function preload() {
     this.load.image('planetB', '/images/planetB.png');
     this.load.image('planetC', '/images/planetC.png');
     this.load.image('planetD', '/images/planetD.png');
+    this.load.audio('gameMusic', '/audio/gameMusic.mp3');
 }
 
 function create() {
+    music= this.sound.add("gameMusic");
+    music.setLoop(true);
+    music.play();
+
     let background = this.add.image(0, 0, 'background').setOrigin(0, 0);
     let scale = Math.max(game.config.width / background.width, game.config.height / background.height);
     background.setScale(scale).setPosition(game.config.width / 2 - background.width * scale / 2, game.config.height / 2 - background.height * scale / 2);
