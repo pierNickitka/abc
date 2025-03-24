@@ -2,6 +2,7 @@ const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
+    parent: 'game-container', // Привязываем к контейнеру
     backgroundColor: '#000000',
     physics: {
         default: 'arcade',
@@ -26,34 +27,42 @@ let gameOverText;
 let levelCompleteText;
 
 function preload() {
-    this.load.image('nloA', '/images/planet.png');
-    this.load.image('nloB', '/images/planet.png');
-    this.load.image('nloC', '/images/planet.png');
-    this.load.image('nloD', '/images/planet.png');
-    this.load.image('planetA', '/images/planet.png');
-    this.load.image('planetB', '/images/planet.png');
-    this.load.image('planetC', '/images/planet.png');
-    this.load.image('planetD', '/images/planet.png');
+    this.load.image('nloA', '/images/nloA.png'); // Уникальные файлы
+    this.load.image('nloB', '/images/nloB.png');
+    this.load.image('nloC', '/images/nloC.png');
+    this.load.image('nloD', '/images/nloD.png');
+
+    this.load.image('planetA', '/images/planetA.png');
+    this.load.image('planetB', '/images/planetB.png');
+    this.load.image('planetC', '/images/planetC.png');
+    this.load.image('planetD', '/images/planetD.png');
 }
 
 function create() {
-    // Создаем группу НЛО
+    // Создаем группу НЛО с равномерным распределением
     nlos = this.physics.add.group();
     const nloKeys = ['nloA', 'nloB', 'nloC', 'nloD'];
+
+    let startX = game.config.width * 0.2; // Начальная позиция НЛО
+    let gap = game.config.width * 0.2; // Расстояние между НЛО
+
     for (let i = 0; i < nloKeys.length; i++) {
-        let nlo = nlos.create(150 + i * 200, 100, nloKeys[i]).setInteractive();
-        nlo.setScale(0.2);  // Уменьшаем размер НЛО
+        let nlo = nlos.create(startX + i * gap, game.config.height * 0.2, nloKeys[i]).setInteractive();
+        nlo.setScale(0.2);
     }
 
-    // Создаем планеты
+    // Создаем планеты с равномерным распределением
     planets = this.physics.add.staticGroup();
-    planets.create(300, 500, 'planetA').setScale(0.3).refreshBody();
-    planets.create(500, 500, 'planetB').setScale(0.3).refreshBody();
-    planets.create(700, 500, 'planetC').setScale(0.3).refreshBody();
-    planets.create(900, 500, 'planetD').setScale(0.3).refreshBody();
+    const planetKeys = ['planetA', 'planetB', 'planetC', 'planetD'];
 
-    // Добавляем коллизии
-    this.physics.add.overlap(nlos, planets, hitPlanet, null, this);
+    let startXPlanets = game.config.width * 0.2; // Начальная позиция планет
+    let gapPlanets = game.config.width * 0.2; // Расстояние между планетами
+
+    for (let i = 0; i < planetKeys.length; i++) {
+        planets.create(startXPlanets + i * gapPlanets, game.config.height * 0.7, planetKeys[i])
+            .setScale(0.3)
+            .refreshBody();
+    }
 
     // Текст с жизнями
     livesText = this.add.text(16, 16, 'Жизни: ' + lives, { fontSize: '32px', fill: '#fff' });
@@ -70,39 +79,58 @@ function create() {
 
     // Взаимодействие с НЛО
     this.input.setDraggable(nlos.getChildren());
+
     this.input.on('drag', (pointer, nlo, dragX, dragY) => {
         nlo.x = dragX;
         nlo.y = dragY;
     });
 
     this.input.on('dragend', (pointer, nlo) => {
-        // Проверяем столкновение с планетами после завершения перемещения
-        this.physics.world.collide(nlo, planets);
+        let planetHit = null;
+
+        planets.getChildren().forEach(planet => {
+            if (Phaser.Geom.Intersects.RectangleToRectangle(nlo.getBounds(), planet.getBounds())) {
+                planetHit = planet;
+            }
+        });
+
+        if (planetHit) {
+            hitPlanet(nlo, planetHit);
+        } else {
+            nlo.setPosition(startX + (nlos.getChildren().indexOf(nlo) * gap), game.config.height * 0.2);
+        }
     });
 }
-
-function update() {
-    if (lives <= 0) {
-        gameOverText.setText('Игра окончена!');
-        nlos.getChildren().forEach(nlo => nlo.setTint(0xff0000));  // Красный оттенок при поражении
-    }
-}
-
 function hitPlanet(nlo, planet) {
-    const nloLetter = nlo.texture.key.charAt(3).toLowerCase();
-    const planetLetter = planet.texture.key.charAt(6).toLowerCase();
+    console.log(nlo.texture.key, planet.texture.key); // Отладка
+
+    const nloLetter = nlo.texture.key.replace('nlo', '').toLowerCase();
+    const planetLetter = planet.texture.key.replace('planet', '').toLowerCase();
 
     if (nloLetter === planetLetter) {
-        nlo.disableBody(true, true);  // Убираем НЛО
+        nlo.disableBody(true, true);
         checkWinCondition();
     } else {
         nlo.setPosition(150 + (nlos.getChildren().indexOf(nlo) * 200), 100);
         lives--;
         livesText.setText('Жизни: ' + lives);
+
+        if (lives <= 0) {
+            gameOverText.setText('Игра окончена!');
+        }
     }
 }
 
+function update() {
+    if (lives <= 0) {
+        gameOverText.setText('Игра окончена!');
+        nlos.getChildren().forEach(nlo => nlo.setTint(0xff0000));
+    }
+}
+
+
 function checkWinCondition() {
+    console.log(nlos.countActive()); // Проверяем активные НЛО
     if (nlos.countActive() === 0) {
         levelCompleteText.setText('Поздравляем, вы выиграли!');
     }
