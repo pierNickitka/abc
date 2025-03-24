@@ -13,7 +13,8 @@ const config = {
     scene: {
         preload: preload,
         create: create,
-        update: update
+        update: update,
+        key: 'gameScene'
     }
 };
 
@@ -41,6 +42,7 @@ function preload() {
 }
 
 function create() {
+    // Добавляем фон
     let background = this.add.image(0, 0, 'background').setOrigin(0, 0);
 
     // Получаем размеры экрана
@@ -55,6 +57,7 @@ function create() {
 
     // Центрируем фон, чтобы он не смещался
     background.setPosition(game.config.width / 2 - background.width * scale / 2, game.config.height / 2 - background.height * scale / 2);
+
     // Создаем группу НЛО
     nlos = this.physics.add.group();
     const nloKeys = ['nloA', 'nloB', 'nloC', 'nloD'];
@@ -99,7 +102,7 @@ function create() {
         planet.letterText = this.add.text(planet.x, planet.y, letter, {
             fontSize: '64px', // Увеличиваем размер шрифта
             fontWeight: 'bold', // Жирный шрифт
-            fill: '#c54b65' // Зеленый цвет
+            fill: '#c54b65' // Красный цвет
         }).setOrigin(0.5);
     }
 
@@ -178,12 +181,33 @@ function checkWinCondition() {
         levelCompleteText.setText('Поздравляем, вы выиграли!');
     }
 }
-
 function update() {
     if (lives <= 0) {
         gameOverText.setText('Игра окончена!');
-        nlos.getChildren().forEach(nlo => nlo.setTint(0xff0000));
+        nlos.getChildren().forEach(nlo => nlo.setTint(0xff0000)); // Красим все НЛО в красный цвет
+
+        // Показываем модальное окно с сообщением о проигрыше
+        showGameOverModal();
     }
 }
+function showGameOverModal() {
+    const gameOverModal = document.getElementById('game-over-modal');
+    gameOverModal.classList.add('show'); // Показываем модальное окно
+    game.scene.pause(); // Останавливаем игру
+}
 
+function restartGame() {
+    // Скрываем модальное окно и перезагружаем игру
+    const gameOverModal = document.getElementById('game-over-modal');
+    gameOverModal.classList.remove('show'); // Скрываем модальное окно
+    lives = 3; // Восстанавливаем жизни
+    livesText.setText('Жизни: ' + lives);
+    gameOverText.setText(''); // Убираем текст окончания игры
 
+    // Перезапускаем сцену (игру) для сброса всех объектов в исходное состояние
+    game.scene.start("gameScene"); // Перезагружаем текущую сцену
+}
+
+function goToMenu(){
+    window.location.href="/";
+}
