@@ -7,43 +7,25 @@ body {
     align-items: center;
     flex-direction: column;
     margin: 0;
+    overflow: hidden; /* Убираем прокрутку */
 }
 
-.game-container {
+.container {
     position: relative;
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+    flex-direction: column;
 }
 
-/* Размер НЛО */
-.nlo {
-    width: 100px;
-    height: 100px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    transition: transform 0.3s;
-}
-
-.nlo:hover {
-    transform: scale(1.1);
-}
-
-/* Планеты */
-.planet {
-    width: 120px;
-    height: 120px;
-    background-size: cover;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-/* Ховер-эффект для планет */
-.planet:hover {
-    transform: scale(1.1);
+.game-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
 }
 
 /* Жизни */
@@ -67,7 +49,91 @@ body {
     transition: opacity 1s ease-in-out;
 }
 
-/* Показать текст */
 .show-text {
     opacity: 1;
+}
+
+.abc-button {
+    position: absolute;
+    bottom: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #4e2c7a;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.abc-button:hover {
+    background-color: #6b3fa0;
+}
+
+#game-over-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s, visibility 0.5s;
+}
+
+#game-over-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.modal-content p {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.modal-content button {
+    background-color: #5d3ebc;
+    color: white;
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.modal-content button:hover {
+    background-color: #7f44b8;
+}
+
+#win-modal{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s, visibility 0.5s;
+}
+
+#win-modal.show {
+    opacity: 1;
+    visibility: visible;
 }

@@ -1,19 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Игра: НЛО</title>
-    <link rel="stylesheet" href="/css/game.css">  <!-- Путь к CSS-стилям -->
+    <link rel="stylesheet" href="/css/game.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
-    <script src="/js/game.js"></script>  <!-- Путь к JavaScript-коду -->
+    <script src="/js/game.js"></script>
 </head>
 <body>
 <div class="container">
     <div id="game-container" class="game-container"></div>
     <button class="abc-button" onclick="window.location.href='/'">Вернуться в главное меню</button>
 </div>
-
-<img src="/images/planet.png" alt="NLO Image"> <!-- Правильный путь к изображению -->
+<div id="game-over-modal" class="hidden">
+    <div class="modal-content">
+        <p>Игра окончена!</p>
+        <button onclick="restartGame()">Попробовать еще раз</button>
+        <button onclick="goToMenu()">Вернуться в меню</button>
+    </div>
+</div>
+<div id="win-modal" class="hidden">
+    <div class="modal-content">
+        <p>Поздравляем, вы выиграли!</p>
+        <button onclick="restartGame()">Попробовать еще раз</button>
+        <button onclick="goToMenu()">Вернуться в меню</button>
+    </div>
+</div>
 </body>
 </html>
